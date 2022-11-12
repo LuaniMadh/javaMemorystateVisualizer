@@ -507,8 +507,8 @@ public class speicherzustand {
     }
 
     public static final String preamble = """
-            % Generated with memorystateVisualizer.java by Mattis Negraszus
-            % https://github.com/luanimadh/memorystateVisualizer
+            % Generated with memorystateVisualizer.java
+            % https://github.com/LuaniMadh/javaMemorystateVisualizer
             \\documentclass{article}
             \\usepackage{tikz}
             \\usetikzlibrary{arrows.meta,decorations.pathreplacing,calligraphy}
