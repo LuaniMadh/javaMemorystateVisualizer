@@ -327,7 +327,6 @@ class drawnObject {
     }
 
     public static drawnObject getDrawnObject(Object o) {
-        System.out.print("drawnObject angefragt für " + o.toString());
         for (drawnObject d : drawnObjects) {
             if (d.o == o) {
                 return d;
