@@ -24,7 +24,7 @@ class Memoryblock {
         length = vars.length;
     }
 
-    public void bake(){
+    public void bake() {
         for (v o : unbakedVars) {
             if (obj.isPrimitive(o.value())) {
                 this.objs.add(new primitive(o.name(), o.value()));
@@ -32,7 +32,7 @@ class Memoryblock {
                 this.objs.add(new reference(o.name(), o.value()));
             }
         }
-        
+
     }
 
     public void setInclusion(boolean includeInGrahics) {
@@ -42,9 +42,6 @@ class Memoryblock {
     String draw(coordinate origin) {
         String s = "";
         if (includeInGrahics) {
-            for (int i = 0; i < objs.size(); i++) {
-                System.out.println("     " + objs.get(i).getName());
-            }
             double y = origin.y();
             ArrayList<obj> alreadyDrawnObjs = new ArrayList<>();
             double highestNameLength = 0;
@@ -157,7 +154,6 @@ class reference extends obj {
 
     public reference(String name, Object o) {
         super(name, o);
-        System.out.println(o.getClass().getSimpleName() + " " + o.toString());
         drawnRep = drawnObject.getDrawnObject(o);
     }
 
@@ -229,7 +225,8 @@ class primitive extends obj {
     String drawMe(coordinate p, ArrayList<obj> paintedObjs, double nameWidth) {
         String s = "";
         s += "% primitive " + getName() + "\n";
-        s += "\\node[] at " + p.move(-memorystateVisualizer.stackWidth / 2 - nameWidth / 2 - 1 * drawnObject.textWidth, 0)
+        s += "\\node[] at "
+                + p.move(-memorystateVisualizer.stackWidth / 2 - nameWidth / 2 - 1 * drawnObject.textWidth, 0)
                 + " {" + getName() + "};\n";
         s += "\\node[] at " + p + " {" + getObj() + "};\n";
         memorystateVisualizer.stackHeight++;
@@ -288,8 +285,6 @@ class drawnObject {
         int attributeAmount = 0;
         for (Field f : fields) {
             try {
-                // System.out.println(f.getName() + " " + f.getType().getSimpleName() + " = " +
-                // f.get(o).getClass().getSimpleName() + ", " + f.get(o));
                 if (obj.isPrimitive(f.getType()))
                     attributes.add(new primitive(f.getName(), f.get(o)));
                 else
@@ -335,7 +330,6 @@ class drawnObject {
         System.out.print("drawnObject angefragt für " + o.toString());
         for (drawnObject d : drawnObjects) {
             if (d.o == o) {
-                System.out.println(" -> gefunden bei " + d.pos);
                 return d;
             }
         }
@@ -343,12 +337,11 @@ class drawnObject {
         if (drawnObjects.isEmpty()) {
             newObj.pos = new coordinate(memorystateVisualizer.heapMinX, 0);
             drawnObjects.add(newObj);
-            System.out.println(" -> neu erstellt bei " + newObj.pos);
             return newObj;
         }
 
         // search for free space
-        
+
         drawnObject firstObj = drawnObjects.get(0);
         // get next free position to the right of lowest
         double nextFreeX = firstObj.pos.x() + firstObj.w + textHeight;
@@ -400,10 +393,8 @@ class drawnObject {
     }
 
     static String drawObjects() {
-        System.out.println("Drawing drawObjects");
         String res = "";
         for (drawnObject d : drawnObjects) {
-            System.out.println(d.o);
             res += d.drawMe();
         }
         return res;
@@ -425,7 +416,6 @@ class drawnObject {
                 maxValWidth = o.drawnCharWidthOfValue();
         }
         maxValWidth += 1.5;
-        System.out.println("maxValwidth: " + maxValWidth);
         int elementIndex = 0;
         for (obj dro : attributes) {
             if (o.getClass().isArray())
@@ -448,7 +438,7 @@ class drawnObject {
         return res;
     }
 
-    public static void clear(){
+    public static void clear() {
         drawnObjects.clear();
     }
 }
@@ -500,9 +490,6 @@ public class memorystateVisualizer {
             memoryblocksToDraw.add(s);
         for (Memoryblock s : speicher)
             memoryblocksToDraw.add(s);
-        for (int i = 0; i < memoryblocksToDraw.size(); i++) {
-            System.out.println(memoryblocksToDraw.get(i).name);
-        }
         latexGraphics.add(new latexElement(captureName, generateLatexCode(memoryblocksToDraw)));
     }
 
@@ -530,24 +517,26 @@ public class memorystateVisualizer {
     static String generateLatexCode(ArrayList<Memoryblock> memoryblocks) {
         double initStackHeight = stackHeight;
         double initStackWidth = stackWidth;
-        
-        for(Memoryblock s : memoryblocks)
+
+        for (Memoryblock s : memoryblocks)
             s.bake();
 
         String latexCode = "" + preamble;
         int i = 0;
         for (Memoryblock sb : memoryblocks) {
             if (sb.includeInGrahics) {
-                System.out.println(sb.name + ": ");
                 latexCode += sb.draw(new coordinate(stackX, stackHeight * stackElementHeight));
-                if(i != memoryblocks.size() - 1){
-                    latexCode += "\\node at " + new coordinate(stackX, (stackHeight+distanceBetweenSpeicherbereichen/2-0.5) * stackElementHeight-drawnObject.textHeight/4) + " {\\vdots};\n";
+                if (i != memoryblocks.size() - 1) {
+                    latexCode += "\\node at " + new coordinate(stackX,
+                            (stackHeight + distanceBetweenSpeicherbereichen / 2 - 0.5) * stackElementHeight
+                                    - drawnObject.textHeight / 4)
+                            + " {\\vdots};\n";
                     stackHeight += distanceBetweenSpeicherbereichen;
                 }
-                    
+
             }
             i++;
-        }        
+        }
         latexCode += "%\n% draw heap\n";
         latexCode += drawnObject.drawObjects();
         latexCode += "%\n% stacklines\n";
@@ -587,42 +576,39 @@ public class memorystateVisualizer {
     }
 
     private static void saveFile(String Name, String FileContent) {
-		FileOutputStream fop = null;
-		File file;
-		String content = FileContent;
+        FileOutputStream fop = null;
+        File file;
+        String content = FileContent;
 
-		try {
+        try {
 
-			file = new File(Name);
+            file = new File(Name);
             System.out.println("Saving file: " + file.getAbsolutePath());
-			fop = new FileOutputStream(file);
+            fop = new FileOutputStream(file);
 
-			// if file doesnt exists, then create it
-			if (!file.exists()) {
-				file.createNewFile();
-			}
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
 
-			// get the content in bytes
-			byte[] contentInBytes = content.getBytes();
+            // get the content in bytes
+            byte[] contentInBytes = content.getBytes();
 
-			fop.write(contentInBytes);
-			fop.flush();
-			fop.close();
-
-			// System.out.println("Done");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (fop != null) {
-					fop.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+            fop.write(contentInBytes);
+            fop.flush();
+            fop.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fop != null) {
+                    fop.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
 
 record v(String name, Object value) {
