@@ -58,29 +58,29 @@ class Memoryblock {
                         highestNameLength * drawnObject.textWidth);
                 alreadyDrawnObjs.add(o);
                 s += "\\draw "
-                        + new coordinate(speicherzustand.stackX - speicherzustand.stackWidth / 2,
-                                y - (speicherzustand.stackElementHeight / 2))
-                        + " -- " + new coordinate(speicherzustand.stackX + speicherzustand.stackWidth / 2,
-                                y - (speicherzustand.stackElementHeight / 2))
+                        + new coordinate(memorystateVisualizer.stackX - memorystateVisualizer.stackWidth / 2,
+                                y - (memorystateVisualizer.stackElementHeight / 2))
+                        + " -- " + new coordinate(memorystateVisualizer.stackX + memorystateVisualizer.stackWidth / 2,
+                                y - (memorystateVisualizer.stackElementHeight / 2))
                         + ";\n";
-                y += speicherzustand.stackElementHeight;
+                y += memorystateVisualizer.stackElementHeight;
             }
             s += "\\draw " // last line
-                    + new coordinate(speicherzustand.stackX - speicherzustand.stackWidth / 2,
-                            y - (speicherzustand.stackElementHeight / 2))
-                    + " -- " + new coordinate(speicherzustand.stackX + speicherzustand.stackWidth / 2,
-                            y - (speicherzustand.stackElementHeight / 2))
+                    + new coordinate(memorystateVisualizer.stackX - memorystateVisualizer.stackWidth / 2,
+                            y - (memorystateVisualizer.stackElementHeight / 2))
+                    + " -- " + new coordinate(memorystateVisualizer.stackX + memorystateVisualizer.stackWidth / 2,
+                            y - (memorystateVisualizer.stackElementHeight / 2))
                     + ";\n";
 
-            double bracketX = origin.x() - speicherzustand.stackWidth / 2
+            double bracketX = origin.x() - memorystateVisualizer.stackWidth / 2
                     - (highestNameLength + 2) * drawnObject.textWidth;
             s += "\\draw " + // curly bracket
                     "[decorate,decoration = {calligraphic brace},thick] "
-                    + new coordinate(bracketX, y - (speicherzustand.stackElementHeight / 2)) + " -- "
-                    + new coordinate(bracketX, origin.y() - speicherzustand.stackElementHeight / 2) + ";\n";
+                    + new coordinate(bracketX, y - (memorystateVisualizer.stackElementHeight / 2)) + " -- "
+                    + new coordinate(bracketX, origin.y() - memorystateVisualizer.stackElementHeight / 2) + ";\n";
             s += "\\draw " + // name
                     new coordinate(bracketX - 1 * drawnObject.textWidth,
-                            (y - speicherzustand.stackElementHeight + origin.y()) / 2)
+                            (y - memorystateVisualizer.stackElementHeight + origin.y()) / 2)
                     + " node[anchor = east] {\\textbf{" + name + "}};\n";
         }
         return s;
@@ -173,10 +173,10 @@ class reference extends obj {
         String s = "";
         s += "% " + name + " -> " + getObj().toString() + "\n";
         s += "\\node[align=right] at "
-                + p.move(-speicherzustand.stackWidth / 2 - nameWidth / 2 - 1 * drawnObject.textWidth, 0) + " {"
+                + p.move(-memorystateVisualizer.stackWidth / 2 - nameWidth / 2 - 1 * drawnObject.textWidth, 0) + " {"
                 + getName() + "};\n";
         s += "\\draw [{Circle}-Stealth] " + p + " -- " + drawnRep.pos + ";\n";
-        speicherzustand.stackHeight++;
+        memorystateVisualizer.stackHeight++;
         return s;
     }
 
@@ -229,10 +229,10 @@ class primitive extends obj {
     String drawMe(coordinate p, ArrayList<obj> paintedObjs, double nameWidth) {
         String s = "";
         s += "% primitive " + getName() + "\n";
-        s += "\\node[] at " + p.move(-speicherzustand.stackWidth / 2 - nameWidth / 2 - 1 * drawnObject.textWidth, 0)
+        s += "\\node[] at " + p.move(-memorystateVisualizer.stackWidth / 2 - nameWidth / 2 - 1 * drawnObject.textWidth, 0)
                 + " {" + getName() + "};\n";
         s += "\\node[] at " + p + " {" + getObj() + "};\n";
-        speicherzustand.stackHeight++;
+        memorystateVisualizer.stackHeight++;
         return s;
     }
 
@@ -341,7 +341,7 @@ class drawnObject {
         }
         drawnObject newObj = new drawnObject(o);
         if (drawnObjects.isEmpty()) {
-            newObj.pos = new coordinate(speicherzustand.heapMinX, 0);
+            newObj.pos = new coordinate(memorystateVisualizer.heapMinX, 0);
             drawnObjects.add(newObj);
             System.out.println(" -> neu erstellt bei " + newObj.pos);
             return newObj;
@@ -356,9 +356,9 @@ class drawnObject {
         ArrayList<drawnObject> possibleObjectsInTheWay = new ArrayList<>();
         for (drawnObject d : drawnObjects)
             possibleObjectsInTheWay.add(d);
-        while (nextFreeY < speicherzustand.maxErrorHeight) {
+        while (nextFreeY < memorystateVisualizer.maxErrorHeight) {
             boolean found = false;
-            while (nextFreeX + newObj.w < speicherzustand.maxWidth) {
+            while (nextFreeX + newObj.w < memorystateVisualizer.maxWidth) {
                 boolean free = true;
                 for (int i = 0; i < possibleObjectsInTheWay.size(); i++) {
                     drawnObject d = possibleObjectsInTheWay.get(i);
@@ -379,7 +379,7 @@ class drawnObject {
                     }
                 }
                 if (free) {
-                    if (nextFreeX + newObj.w < speicherzustand.maxWidth)
+                    if (nextFreeX + newObj.w < memorystateVisualizer.maxWidth)
                         found = true;
                     break;
                 }
@@ -388,7 +388,7 @@ class drawnObject {
                 break;
 
             nextFreeY += textHeight;
-            nextFreeX = speicherzustand.heapMinX;
+            nextFreeX = memorystateVisualizer.heapMinX;
         }
         newObj.setPos(new coordinate(nextFreeX, nextFreeY));
         drawnObjects.add(newObj);
@@ -467,26 +467,26 @@ record coordinate(double x, double y) {
 record latexElement(String name, String value) {
 }
 
-public class speicherzustand {
+public class memorystateVisualizer {
 
-    static ArrayList<Memoryblock> speicherbereiche = new ArrayList<>();
+    static ArrayList<Memoryblock> memoryblocks = new ArrayList<>();
     static ArrayList<latexElement> latexGraphics = new ArrayList<>();
 
-    public static void captureSpeicherbereich(String name, v... vars) {
-        for (int i = 0; i < speicherbereiche.size(); i++) {
-            Memoryblock s = speicherbereiche.get(i);
+    public static void captureMemoryblock(String name, v... vars) {
+        for (int i = 0; i < memoryblocks.size(); i++) {
+            Memoryblock s = memoryblocks.get(i);
             if (s.name.equals(name)) {
-                speicherbereiche.set(i, new Memoryblock(name, vars));
+                memoryblocks.set(i, new Memoryblock(name, vars));
                 return;
             }
         }
         Memoryblock sb = new Memoryblock(name, vars);
-        speicherbereiche.add(sb);
+        memoryblocks.add(sb);
     }
 
     public static void include(String... names) {
         for (String name : names) {
-            for (Memoryblock sb : speicherbereiche) {
+            for (Memoryblock sb : memoryblocks) {
                 if (sb.name.equals(name)) {
                     sb.setInclusion(true);
                 }
@@ -496,7 +496,7 @@ public class speicherzustand {
 
     public static void captureMemorystate(String captureName, Memoryblock... speicher) {
         ArrayList<Memoryblock> memoryblocksToDraw = new ArrayList<>();
-        for (Memoryblock s : speicherbereiche)
+        for (Memoryblock s : memoryblocks)
             memoryblocksToDraw.add(s);
         for (Memoryblock s : speicher)
             memoryblocksToDraw.add(s);
@@ -507,8 +507,8 @@ public class speicherzustand {
     }
 
     public static final String preamble = """
-            % Generated with memorystateVisualizer.java by Mattis Negraszus
-            % https://github.com/luanimadh/memorystateVisualizer
+            % Generated with memorystateVisualizer.java
+            % https://github.com/LuaniMadh/javaMemorystateVisualizer
             \\documentclass{article}
             \\usepackage{tikz}
             \\usetikzlibrary{arrows.meta,decorations.pathreplacing,calligraphy}
